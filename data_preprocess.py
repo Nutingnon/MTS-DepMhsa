@@ -155,6 +155,8 @@ def copy_images(imagePaths, target_folder, min_frames=10, n_frames=12):
 
 
 if __name__ == "__main__":
+    # source_normal_dir = ["./ct_scans/light_to_moderate/"]
+    # source_anomaly_dir = ["./ct_scans/moderate_to_severe/"]
     source_normal_dir = ["./source_data/enhanced_ct_scans/light_to_moderate/"]
     source_anomaly_dir = ["./source_data/enhanced_ct_scans/moderate_to_severe/"]
     target_dir = './processed_data/enhanced_ct_scans/'

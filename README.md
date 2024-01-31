@@ -34,6 +34,11 @@ Welcome to the official repository of **DEP-MHSA**, a state-of-the-art deep lear
 
 - **High Accuracy and Precision**: Rigorously tested on the collected CT scan datasets, which achieved highest performance across F1-Score, Accuracy and AUC.
 
+
+
+## Network Structure 
+The figure illustrates the main architecture of the DEP-MHSA network. Our model leverages advanced neural network techniques to enhance feature extraction and improve diagnostic accuracy.
+
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
@@ -46,22 +51,6 @@ Welcome to the official repository of **DEP-MHSA**, a state-of-the-art deep lear
 </center>
 
 
-## Network Structure 
-The above figure illustrates the main architecture of the DEP-MHSA network. Our model leverages advanced neural network techniques to enhance feature extraction and improve diagnostic accuracy.
-
-#### Sample 1
-
-[Description of the findings and model's diagnosis for Sample 1.]
-
-#### Sample 2
-
-[Description of the findings and model's diagnosis for Sample 2.]
-
-#### Sample 3
-
-[Description of the findings and model's diagnosis for Sample 3.]
-
-
 ## Getting Started
 To use `DEP-MHSA` in your research or clinical practice, follow these steps:
 
@@ -70,7 +59,14 @@ To use `DEP-MHSA` in your research or clinical practice, follow these steps:
 3. Follow the detailed usage instructions in the [Documentation]().
 
 ## Data Acquisition
-You can achieve data through [this link]()
+You can achieve data through [Google Drive](https://drive.google.com/file/d/1DZ7wyg6ATCzNFqAbawQorg-PjtN0aBhL/view?usp=drive_link)
+
+The data contains:
+- `./anonymized_ct_scans/` a directory containing **CT** scans images of `747` subjects.
+- `./anonymized_enhanced_ct_scans` a directory containing **enhanced CT** scans images of `366` subjects.
+- `public_label_table.csv` a `.csv` file contains 2 columns, `patient_name` is the column indicating anonymized patient name, `label` column contains binary values as `0` and `1`
+
+If you are interested in the method of preprocessing, please refer to the script `cdta_preprocess.py`
 
 ## Contributing
 We welcome contributions to the **DEP-MHSA** project! Please read our [Contributing Guidelines]() for more information on how you can contribute.
