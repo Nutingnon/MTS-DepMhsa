@@ -4,13 +4,8 @@ import os
 import re
 import PIL.Image as Image
 from pydicom import dcmread
-from pydicom.data import get_testdata_files
-from matplotlib import pyplot as plt
 from tqdm import tqdm
-import multiprocessing as mp
 from joblib import Parallel, delayed
-import uuid
-from tqdm.contrib.concurrent import process_map
 
 
 
