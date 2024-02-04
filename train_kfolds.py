@@ -56,7 +56,7 @@ parser.add_argument("--y_img_size",
 
 parser.add_argument("--batch_size",
                     type=int,
-                    default=32,  # 48
+                    default=50,  # 48
                     help="Number of batch size.")
 
 parser.add_argument("--epochs",
@@ -66,7 +66,7 @@ parser.add_argument("--epochs",
 
 parser.add_argument("--lr",
                     type=float,
-                    default=5e-4, #8e-4, 5e-4
+                    default=2e-4, #8e-4, 5e-4
                     help="Number of learning rate.")
 
 parser.add_argument("--step_lr",
@@ -123,6 +123,13 @@ parser.add_argument("--valid_batch_size",
 args = parser.parse_args()
 
 
+seed = 114514
+os.environ["PYTHONHASHSEED"] = str(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.backends.cudnn.deterministic=True
+torch.backends.cudnn.benchmark=True
 
 
 data_folder = "/home/yixin/study/phd_program/changshu_files/"
@@ -165,23 +172,23 @@ else:
 kf = KFold(n_splits=5, shuffle=True)
 test_loader = DataLoader(dataset=test_set,
                         batch_size=args.valid_batch_size, pin_memory=True)
-train_loader = DataLoader(dataset=train_set,
-                        batch_size=args.batch_size, pin_memory=True)
-seeds = [114514, 3407, 79486, 66141, 33985]
 
-
-
-for idx, seed in enumerate(seeds):
-    os.environ["PYTHONHASHSEED"] = str(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic=True
-    torch.backends.cudnn.benchmark=True
+for fold, (train_idx, test_idx) in enumerate(kf.split(train_set)):
+    print(f"Fold {fold + 1}")
+    print("-------")
     criterion_reg = nn.CrossEntropyLoss(weight=torch.Tensor([1, 3]).to(device)) # label balance 1:3
     loss_min = np.inf
     # Start time of learning
-    total_start_training = time.time()    
+    total_start_training = time.time()
+
+
+    train_loader = DataLoader(dataset=train_set,
+                            batch_size=args.batch_size, pin_memory=True,
+                            sampler=torch.utils.data.SubsetRandomSampler(train_idx),)
+    valid_loader = DataLoader(dataset=train_set,
+                            batch_size=args.valid_batch_size, pin_memory=True,
+                            sampler=torch.utils.data.SubsetRandomSampler(test_idx),)
+    
     model = resnet18_depmhsa(pretrained=False, num_classes=2, 
                                 input_size=(args.y_img_size, args.x_img_size), 
                                 n_frames=args.frames_num,  args=args)
@@ -253,30 +260,30 @@ for idx, seed in enumerate(seeds):
         history_acc['train'].append(calculate_metrics(y_pred_list, y_true_list)['acc'])
 
         model.eval()
-        # val_loss, val_acc = validation_run(valid_loader, device, model, criterion_reg)
+        val_loss, val_acc = validation_run(valid_loader, device, model, criterion_reg)
         test_loss, test_acc = validation_run(test_loader, device, model, criterion_reg, val_or_test="Test")
 
         train_loss = running_loss / len(train_loader)
-        # history_acc['valid'].append(val_acc)
+        history_acc['valid'].append(val_acc)
         history_acc['test'].append(test_acc)
 
         
         print(f"Train Loss: {train_loss:.3f} ",
-            # f"\nVal Loss: {val_loss:.3f}",
+            f"\nVal Loss: {val_loss:.3f}",
             f"\nTrain Acc: {history_acc['train'][-1]:.3f}",
-            # f"\nValid Acc: {history_acc['valid'][-1]:.3f}",
+            f"\nValid Acc: {history_acc['valid'][-1]:.3f}",
             f"\nTest Acc: {history_acc['test'][-1]:.3f}",
             )
         
         curr_acc = history_acc['test'][-1]
-        early_stopper(model, test_loss, train_acc=history_acc['train'][-1], val_acc=curr_acc, epoch=epoch)
-        save_path = save_folder + f"{args.model_name}_seed_{seed}_with_early_stop_train_acc_{str(early_stopper.best_acc)[:5]}.pt"
+        early_stopper(model, val_loss, train_acc=history_acc['train'][-1], val_acc=curr_acc, epoch=epoch)
+        save_path = save_folder + f"{args.model_name}_fold_{fold}_with_early_stop_train_acc_{str(early_stopper.best_acc)[:5]}.pt"
         print(early_stopper.status)
         
         if early_stopper.early_stop:
             print('    ', end='')
             print(f"Train Loss: {train_loss:.3f} ",
-                # f"\nVal Loss: {val_loss:.3f}",
+                f"\nVal Loss: {val_loss:.3f}",
                 f"\nTrain Acc: {history_acc['train'][-1]:.3f}",
                 f"\nValid Acc: {history_acc['valid'][-1]:.3f}",
                 f"\nTest Acc: {history_acc['test'][-1]:.3f}",
@@ -293,7 +300,7 @@ for idx, seed in enumerate(seeds):
     print('Training finished, took {:.2f}s'.format(time.time() - total_start_training))
     last_mean_val_acc = np.round(np.mean(history_acc['test'][-10:]),2)
 
-    with open(save_folder + f'{args.model_name}_seed_{seed}_with_early_stop_history_train_{last_mean_val_acc}_best_{str(early_stopper.best_acc)[:5]}.pickle', 'wb') as handle:
+    with open(save_folder + f'{args.model_name}_fold_{fold}_with_early_stop_history_train_{last_mean_val_acc}_best_{str(early_stopper.best_acc)[:5]}.pickle', 'wb') as handle:
         pickle.dump(history_acc, handle,  protocol=pickle.HIGHEST_PROTOCOL)
     torch.save(early_stopper.best_model_state, save_path)
 

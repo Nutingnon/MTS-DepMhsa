@@ -7,7 +7,6 @@ from typing import Any, Callable, List, Optional, Sequence, Tuple, Type, Union
 from models.dep_mhsa.attentions.mhsa_collection import MHSA3D, DepMHSA
 from models.dep_mhsa.attentions.single_module_attn import SingleModalAtten
 from models.dep_mhsa.attentions.channel_attention import CAB3D
-from einops import rearrange
 from models.dep_mhsa.resnets.blocks import BasicBlock, BasicBlockWithAttention, Bottleneck
 from models.dep_mhsa.resnets.stems import R2Plus1dStem, BasicStem
 
@@ -162,7 +161,7 @@ class VideoResNet(nn.Module):
         self,
         block: Type[Union[BasicBlock, Bottleneck]],
         conv_builder: Type[Union[Conv3DSimple, Conv3DNoTemporal, Conv2DPlus1D]],
-        attn_builder: Type[Union[MHSA3D, SingleModalAtten]],
+        attn_builder: Type[Union[MHSA3D, SingleModalAtten, DepMHSA, CAB3D]],
         planes: int,
         blocks: int,
         stride: int = 1,
@@ -200,5 +199,3 @@ def _video_resnet(
 ) -> VideoResNet:
     model = VideoResNet(block, conv_makers, layers, stem, **kwargs)
     return model
-
-
