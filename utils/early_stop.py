@@ -31,7 +31,7 @@ class EarlyStopping():
         self.status = ""
         self.early_stop = False
 
-    def __call__(self, model, val_loss, train_acc, val_acc, epoch, train_acc_threshold=0.75, epoch_threshold = 15):
+    def __call__(self, model, val_loss, train_acc, val_acc, epoch, train_acc_threshold=0.80, epoch_threshold = 20):
         if self.best_loss is None:
             self.best_loss = val_loss
             self.best_model_state = copy.deepcopy(model.state_dict())

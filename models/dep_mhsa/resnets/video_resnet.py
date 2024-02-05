@@ -120,6 +120,7 @@ class VideoResNet(nn.Module):
 
         self.avgpool = nn.AdaptiveAvgPool3d((1, 1, 1))
         self.fc = nn.Linear(512 * block.expansion, num_classes)
+                                
 
         # init weights
         for m in self.modules():

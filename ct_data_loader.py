@@ -234,7 +234,7 @@ class CtImages(Dataset):
                                             A.MedianBlur(blur_limit=3, p=0.2),
                                             A.Blur(blur_limit=3, p=0.5),
                                             A.GaussianBlur(p=0.3)], 
-                                            p=0.4),
+                                            p=0.2),
                                             ToTensorV2(p=1)],
                                         additional_targets={f"image{i}": "image" for i in range(len(video_frames) - 1)}
                                         )

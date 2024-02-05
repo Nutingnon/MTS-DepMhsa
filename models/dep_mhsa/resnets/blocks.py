@@ -76,7 +76,8 @@ class BasicBlock(nn.Module):
         else:
             raise TypeError("Unknown Type for attention block")
             
-        self.relu2 = nn.ReLU()
+        # self.relu2 = nn.LeakyReLU()
+        self.relu2 = nn.PReLU()
         
         self.downsample = downsample
         self.stride = stride
@@ -84,7 +85,7 @@ class BasicBlock(nn.Module):
                 # init weights
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
-                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="leaky_relu")
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.Linear):

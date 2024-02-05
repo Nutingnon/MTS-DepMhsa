@@ -56,17 +56,17 @@ parser.add_argument("--y_img_size",
 
 parser.add_argument("--batch_size",
                     type=int,
-                    default=32,  # 48
+                    default=48,  # 48
                     help="Number of batch size.")
 
 parser.add_argument("--epochs",
                     type=int,
-                    default=100,
+                    default=200,
                     help="Number of epochs.")
 
 parser.add_argument("--lr",
                     type=float,
-                    default=5e-4, #8e-4, 5e-4
+                    default=3e-4, #8e-4, 5e-4
                     help="Number of learning rate.")
 
 parser.add_argument("--step_lr",
@@ -127,7 +127,7 @@ args = parser.parse_args()
 
 data_folder = "/home/yixin/study/phd_program/changshu_files/"
 save_folder = "/home/yixin/study/phd_program/changshu_files/tmp_results/"
-args.model_name = "mts_diagnosis_ct_scans_dep_mhsa"
+args.model_name = "mts_diagnosis_ct_scans_DEPMHSA_"
 train_name = "train_data.csv"
 test_name = "test_data.csv"
 
@@ -166,10 +166,10 @@ kf = KFold(n_splits=5, shuffle=True)
 test_loader = DataLoader(dataset=test_set,
                         batch_size=args.valid_batch_size, pin_memory=True)
 train_loader = DataLoader(dataset=train_set,
-                        batch_size=args.batch_size, pin_memory=True)
-seeds = [114514, 3407, 79486, 66141, 33985]
+                        batch_size=args.batch_size, pin_memory=True,shuffle=True)
 
-
+# seeds = [114514, 3407, 79486, 66141, 1408, 8818, 9915, 1103, 33453, 8777, 12]
+seeds = [33453]*10
 
 for idx, seed in enumerate(seeds):
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -177,11 +177,14 @@ for idx, seed in enumerate(seeds):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic=True
-    torch.backends.cudnn.benchmark=True
-    criterion_reg = nn.CrossEntropyLoss(weight=torch.Tensor([1, 3]).to(device)) # label balance 1:3
+    torch.backends.cudnn.benchmark=False
+    # torch.use_deterministic_algorithms(True)
+
+
+    criterion_reg = nn.CrossEntropyLoss(weight=torch.Tensor([1, 2.5]).to(device)) # label balance 1:3
     loss_min = np.inf
     # Start time of learning
-    total_start_training = time.time()    
+    total_start_training = time.time()
     model = resnet18_depmhsa(pretrained=False, num_classes=2, 
                                 input_size=(args.y_img_size, args.x_img_size), 
                                 n_frames=args.frames_num,  args=args)
@@ -278,16 +281,14 @@ for idx, seed in enumerate(seeds):
             print(f"Train Loss: {train_loss:.3f} ",
                 # f"\nVal Loss: {val_loss:.3f}",
                 f"\nTrain Acc: {history_acc['train'][-1]:.3f}",
-                f"\nValid Acc: {history_acc['valid'][-1]:.3f}",
+                # f"\nValid Acc: {history_acc['valid'][-1]:.3f}",
                 f"\nTest Acc: {history_acc['test'][-1]:.3f}",
                 )
             torch.save(early_stopper.best_model_state, save_path)
             print(f"Current best val accuracy {str(early_stopper.best_acc)[:5]}. Model saved!")
             break
 
-        if  np.round(curr_acc,3) > best_val_acc and (epoch > int(args.epochs*0.9)):
-            best_val_acc = np.round(curr_acc, 3)
-            best_weights = copy.deepcopy(model.state_dict())
+
         scheduler.step()
 
     print('Training finished, took {:.2f}s'.format(time.time() - total_start_training))
