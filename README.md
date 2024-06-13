@@ -71,5 +71,12 @@ We welcome contributions to the **DEP-MHSA** project! Please read our [Contribut
 If you use DEP-MHSA or our collected dataset in your research, please cite our paper:
 
 ```
-BibTeX entry of the publication
+@misc{huang2024mtsnet,
+      title={MTS-Net: Dual-Enhanced Positional Multi-Head Self-Attention for 3D CT Diagnosis of May-Thurner Syndrome}, 
+      author={Yixin Huang and Yiqi Jin and Ke Tao and Kaijian Xia and Jianfeng Gu and Lei Yu and Lan Du and Cunjian Chen},
+      year={2024},
+      eprint={2406.04680},
+      archivePrefix={arXiv},
+      primaryClass={eess.IV}
+}
 ```
