@@ -59,14 +59,7 @@ To use `DEP-MHSA` in your research or clinical practice, follow these steps:
 3. Follow the detailed usage instructions in the [Documentation]().
 
 ## Data Acquisition
-You can achieve data through [Google Drive](https://drive.google.com/file/d/1DZ7wyg6ATCzNFqAbawQorg-PjtN0aBhL/view?usp=drive_link)
-
-The data contains:
-- `./anonymized_ct_scans/` a directory containing **CT** scans images of `747` subjects.
-- `./anonymized_enhanced_ct_scans` a directory containing **enhanced CT** scans images of `366` subjects.
-- `public_label_table.csv` a `.csv` file contains 2 columns, `patient_name` is the column indicating anonymized patient name, `label` column contains binary values as `0` and `1`
-
-If you are interested in the method of preprocessing, please refer to the script `cdta_preprocess.py`
+The data will be released once the paper accepted
 
 ## Contributing
 We welcome contributions to the **DEP-MHSA** project! Please read our [Contributing Guidelines]() for more information on how you can contribute.
